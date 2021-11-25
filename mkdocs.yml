@@ -1,4 +1,4 @@
-site_name: ...
+site_name: Django REST framework Browsable Router
 nav:
   - Home: index.md
 theme:

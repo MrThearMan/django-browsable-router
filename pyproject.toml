@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-browsable-router"
-version = "0.0.7"
+version = "0.1.0"
 description = "A Django REST Framework router that can show APIViews and include other routers as navigable urls in the root view."
 authors = [
     "Matti Lamppu <lamppu.matti.akseli@gmail.com>",

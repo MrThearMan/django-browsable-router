@@ -42,7 +42,7 @@ class APIRouter(DefaultRouter):
     def navigation_routes(self, value: Dict[str, "APIRouter"]):
         self._navigation_routes = value
 
-    def get_routes(self, viewset: Type[Union[ViewSet, APIView]]):
+    def get_routes(self, viewset: type[Union[ViewSet, APIView]]):
         if issubclass(viewset, ViewSetMixin):
             return super().get_routes(viewset)
         return []
