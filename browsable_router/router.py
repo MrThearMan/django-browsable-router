@@ -9,7 +9,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSetMixin
 
-from .views import APIRootView
+from .views import APIRootView as RootView
 
 
 __all__ = ["APIRouter"]
@@ -23,13 +23,14 @@ class APIRouter(DefaultRouter):
     """Router that will show APIViews in API root."""
 
     registry: List[Tuple[str, Type[APIView], str, dict]]
+    APIRootView: APIView = RootView
 
     def __init__(self, name: str = None, docstring: str = None, **kwargs):
         self._navigation_routes: Dict[str, "APIRouter"] = {}
 
-        name = name if name is not None else "APIRootView"
-        self._root_view: Type[APIRootView] = type(name, (APIRootView,), {})  # noqa
-        self._root_view.__doc__ = docstring if docstring else APIRootView.__doc__
+        name = name if name is not None else self.APIRootView.__name__
+        self._root_view: Type[self.APIRootView] = type(name, (self.APIRootView,), {})  # noqa
+        self._root_view.__doc__ = docstring if docstring else self.APIRootView.__doc__
         self._root_view.schema = DefaultSchema() if kwargs.get("show_in_shema", False) else None
         self._root_view._ignore_model_permissions = kwargs.get("ignore_model_permissions", False)
 
