@@ -19,6 +19,9 @@ class APIRootView(APIView):
 
     api_root_dict: Dict[str, Tuple[str, dict[str, Any]]] = {}
 
+    authentication_classes = []
+    permission_classes = []
+
     def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         routes = {}
         namespace = request.resolver_match.namespace
