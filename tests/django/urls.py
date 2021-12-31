@@ -1,5 +1,3 @@
-import re
-
 from django.urls import include, path
 from rest_framework import serializers
 from rest_framework.mixins import CreateModelMixin, ListModelMixin

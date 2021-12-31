@@ -1,4 +1,5 @@
-from typing import Protocol, Set, Union
+import logging
+from typing import Optional, Protocol, Set, Union
 
 from django.utils.encoding import force_str
 from rest_framework.fields import DictField, Field, SerializerMethodField
@@ -7,14 +8,17 @@ from rest_framework.request import Request, clone_request
 from rest_framework.serializers import HiddenField, ListSerializer, ManyRelatedField, RelatedField, Serializer
 
 
+__all__ = ["APIMetadata", "SerializerAsOutputMetadata"]
+
+
+logger = logging.getLogger(__name__)
+
+
 class _View(Protocol):
     allowed_methods: Set[str]
 
     def get_serializer(self, *args, **kwargs) -> Serializer:
         """Get serializer"""
-
-
-__all__ = ["APIMetadata", "SerializerAsOutputMetadata"]
 
 
 class APIMetadata(SimpleMetadata):
@@ -25,12 +29,19 @@ class APIMetadata(SimpleMetadata):
     skip_fields = [HiddenField, SerializerMethodField]
 
     @staticmethod
-    def get_input_serializer(view: _View):
+    def get_input_serializer(view: _View) -> Serializer:
         return view.get_serializer()
 
     @staticmethod
-    def get_output_serializer(view: _View):
-        return view.get_serializer(output=True)
+    def get_output_serializer(view: _View) -> Optional[Serializer]:
+        try:
+            return view.get_serializer(output=True)
+        except TypeError:
+            logger.info(
+                "To get access to output metadata, define view.get_serializer() so that it takes a "
+                "boolean argument 'output', and return an output serializer when output=True."
+            )
+            return None
 
     def determine_actions(self, request: Request, view: _View):
         """Return information about the fields that are accepted for methods in self.recognized_methods."""
@@ -42,13 +53,16 @@ class APIMetadata(SimpleMetadata):
             output_serializer = self.get_output_serializer(view)
 
             exceptions = getattr(input_serializer, "error_codes", {})
-            exceptions.update(getattr(output_serializer, "error_codes", {}))
+            if output_serializer is not None:
+                exceptions.update(getattr(output_serializer, "error_codes", {}))
 
             actions[method] = {
                 "input": self.get_serializer_info(input_serializer),
-                "output": self.get_serializer_info(output_serializer),
                 "exceptions": exceptions,
             }
+            if output_serializer is not None:
+                actions[method]["output"] = self.get_serializer_info(output_serializer)
+
             view.request = request
 
         return actions

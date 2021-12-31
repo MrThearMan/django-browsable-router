@@ -1,4 +1,3 @@
-
 export DJANGO_SETTINGS_MODULE = tests.django.settings
 
 .PHONY: help dev-setup dev-server translations dev-docs build-docs submit-docs lock tests tox pre-commit black isort pylint flake8 mypy Makefile
@@ -39,8 +38,8 @@ dev-docs:
 	@poetry run mkdocs serve
 
 translations:
-	@poetry run python manage.py makemessages -l fi
-	@poetry run python manage.py compilemessages
+	@poetry run python manage.py makemessages -l fi --ignore=.venv --ignore=.tox
+	@poetry run python manage.py compilemessages --ignore=.venv --ignore=.tox
 
 build-docs:
 	@poetry run mkdocs build
@@ -49,7 +48,7 @@ submit-docs:
 	@poetry run mkdocs gh-deploy
 
 tests:
-	@poetry run coverage run pytest -vv -s
+	@poetry run coverage run -m pytest -vv -s --log-cli-level=INFO
 
 tox:
 	@poetry run tox
@@ -64,10 +63,10 @@ isort:
 	@poetry run isort .
 
 pylint:
-	@poetry run pylint pipeline_views/
+	@poetry run pylint browsable_router/
 
 flake8:
-	@poetry run flake8 --max-line-length=120 --extend-ignore=E203,E501 pipeline_views/
+	@poetry run flake8 --max-line-length=120 --extend-ignore=E203,E501 browsable_router/
 
 mypy:
-	@poetry run mypy pipeline_views/
+	@poetry run mypy browsable_router/
