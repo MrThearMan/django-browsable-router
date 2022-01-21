@@ -1,3 +1,4 @@
+from django.core.management import call_command
 from django.urls import include, path
 from rest_framework import serializers
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
@@ -8,6 +9,10 @@ from rest_framework.viewsets import GenericViewSet
 
 from browsable_router.meta import APIMetadata
 from browsable_router.router import APIRouter
+
+
+call_command("makemigrations")
+call_command("migrate")
 
 
 router = APIRouter()

@@ -1,11 +1,19 @@
 import logging
-from typing import Optional, Protocol, Set, Union
 
 from django.utils.encoding import force_str
 from rest_framework.fields import DictField, Field, SerializerMethodField
 from rest_framework.metadata import SimpleMetadata
 from rest_framework.request import Request, clone_request
-from rest_framework.serializers import HiddenField, ListSerializer, ManyRelatedField, RelatedField, Serializer
+from rest_framework.serializers import (
+    HiddenField,
+    ListSerializer,
+    ManyRelatedField,
+    ReadOnlyField,
+    RelatedField,
+    Serializer,
+)
+
+from .typing import DictOrListOfDicts, List, Optional, Set, Type, Union, ViewProtocol
 
 
 __all__ = ["APIMetadata", "SerializerAsOutputMetadata"]
@@ -14,26 +22,22 @@ __all__ = ["APIMetadata", "SerializerAsOutputMetadata"]
 logger = logging.getLogger(__name__)
 
 
-class _View(Protocol):
-    allowed_methods: Set[str]
-
-    def get_serializer(self, *args, **kwargs) -> Serializer:
-        """Get serializer"""
-
-
 class APIMetadata(SimpleMetadata):
-    """Metadata class that adds input and output info for each of the attached views methods based on
-    the serializer for that method."""
+    """Metadata class that adds input and output info for
+    each of the attached views methods based on
+    the serializer for that method.
+    """
 
-    recognized_methods = {"GET", "POST", "PUT", "PATCH", "DELETE"}
-    skip_fields = [HiddenField, SerializerMethodField]
+    recognized_methods: Set[str] = {"GET", "POST", "PUT", "PATCH", "DELETE"}
+    skip_fields: Set[Type[Field]] = {ReadOnlyField, HiddenField, SerializerMethodField}
+    used_attrs: List[str] = ["label", "help_text", "min_length", "max_length", "min_value", "max_value"]
 
     @staticmethod
-    def get_input_serializer(view: _View) -> Serializer:
+    def get_input_serializer(view: ViewProtocol) -> Serializer:
         return view.get_serializer()
 
     @staticmethod
-    def get_output_serializer(view: _View) -> Optional[Serializer]:
+    def get_output_serializer(view: ViewProtocol) -> Optional[Serializer]:
         try:
             return view.get_serializer(output=True)
         except TypeError:
@@ -43,7 +47,7 @@ class APIMetadata(SimpleMetadata):
             )
             return None
 
-    def determine_actions(self, request: Request, view: _View):
+    def determine_actions(self, request: Request, view: ViewProtocol):
         """Return information about the fields that are accepted for methods in self.recognized_methods."""
         actions = {}
         for method in self.recognized_methods & set(view.allowed_methods):
@@ -67,7 +71,7 @@ class APIMetadata(SimpleMetadata):
 
         return actions
 
-    def get_serializer_info(self, serializer: Serializer) -> Union[list, dict]:
+    def get_serializer_info(self, serializer: Serializer) -> DictOrListOfDicts:
         """Given an instance of a serializer, return a dictionary of metadata about its fields."""
         data_serializer = getattr(serializer, "child", serializer)
 
@@ -86,7 +90,7 @@ class APIMetadata(SimpleMetadata):
 
         return input_data
 
-    def get_field_info(self, field: Union[Field, Serializer, ListSerializer]) -> Union[list, dict]:
+    def get_field_info(self, field: Union[Field, Serializer, ListSerializer]) -> DictOrListOfDicts:
         if getattr(field, "child", False):
             if isinstance(field, DictField):
                 return {"<key>": self.get_field_info(field.child)}
@@ -94,18 +98,12 @@ class APIMetadata(SimpleMetadata):
         if getattr(field, "fields", False):
             return self.get_serializer_info(field)
 
-        field_info = {"type": self.label_lookup[field], "required": getattr(field, "required", False)}
+        field_info = {
+            "type": self.label_lookup[field],
+            "required": getattr(field, "required", False),
+        }
 
-        attrs = [
-            "label",
-            "help_text",
-            "min_length",
-            "max_length",
-            "min_value",
-            "max_value",
-        ]
-
-        for attr in attrs:
+        for attr in self.used_attrs:
             value = getattr(field, attr, None)
             if value is not None and value != "":
                 info = force_str(value, strings_only=True)
@@ -126,7 +124,7 @@ class APIMetadata(SimpleMetadata):
 class SerializerAsOutputMetadata(APIMetadata):
     """Metadata class that presumes that view serializer is used as response data with no request data."""
 
-    def determine_actions(self, request: Request, view: _View) -> Union[list, dict]:
+    def determine_actions(self, request: Request, view: ViewProtocol) -> DictOrListOfDicts:
         """Return information about the fields that are accepted for methods in self.recognized_methods."""
         actions = {}
         for method in self.recognized_methods & set(view.allowed_methods):

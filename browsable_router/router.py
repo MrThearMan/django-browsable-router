@@ -1,5 +1,5 @@
+import logging
 import re
-from typing import Any, Callable, Dict, List, Tuple, Type, Union
 
 from django.urls import include, path, re_path
 from django.urls.resolvers import URLPattern, URLResolver
@@ -9,30 +9,37 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSetMixin
 
+from .typing import Any, Callable, Dict, List, Tuple, Type, Union, UrlsType, ViewType
 from .views import APIRootView as RootView
 
 
 __all__ = ["APIRouter"]
 
 
-UrlsType = list[Union[URLResolver, URLPattern]]
-ViewType = Union[Type[APIView], Type[ViewSetMixin]]
+logger = logging.getLogger(__name__)
 
 
 class APIRouter(DefaultRouter):
     """Router that will show APIViews in API root."""
 
-    registry: List[Tuple[str, Type[APIView], str, dict]]
+    registry: List[Tuple[str, Type[APIView], str, Dict[str, Any]]]
     APIRootView: APIView = RootView
 
-    def __init__(self, name: str = None, docstring: str = None, **kwargs):
+    def __init__(
+        self,
+        name: str = None,
+        docstring: str = None,
+        show_in_shema: bool = False,
+        ignore_model_permissions: bool = False,
+        **kwargs,
+    ):
         self._navigation_routes: Dict[str, "APIRouter"] = {}
 
         name = name if name is not None else self.APIRootView.__name__
         self._root_view: Type[self.APIRootView] = type(name, (self.APIRootView,), {})  # noqa
         self._root_view.__doc__ = docstring if docstring else self.APIRootView.__doc__
-        self._root_view.schema = DefaultSchema() if kwargs.get("show_in_shema", False) else None
-        self._root_view._ignore_model_permissions = kwargs.get("ignore_model_permissions", False)
+        self._root_view.schema = DefaultSchema() if show_in_shema else None
+        self._root_view._ignore_model_permissions = ignore_model_permissions
 
         self.root_view_name: str = name
         super().__init__(**kwargs)

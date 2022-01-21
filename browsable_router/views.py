@@ -1,11 +1,12 @@
 import logging
-from typing import Any, Dict, Tuple
 
 from django.urls import NoReverseMatch
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
+
+from .typing import Any, Dict, Tuple
 
 
 __all__ = ["APIRootView"]
