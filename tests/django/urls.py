@@ -28,6 +28,9 @@ class Viewset(ListModelMixin, CreateModelMixin, GenericViewSet):
     metadata_class = APIMetadata
     serializer_class = InputSerializer
 
+    def perform_create(self, serializer):
+        pass
+
     def get_queryset(self):
         return {}
 
@@ -40,7 +43,12 @@ class View(APIView):
         return Response()
 
     def post(self, request, *args, **kwargs):
-        return Response()
+        data = {"email": request.data["email"]}
+        return Response(data=data)
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs.setdefault("context", {"request": self.request, "format": self.format_kwarg, "view": self})
+        return self.serializer_class(*args, **kwargs)
 
 
 router2.register(r"test1", Viewset, "route1test1")

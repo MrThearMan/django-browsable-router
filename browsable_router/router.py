@@ -46,13 +46,15 @@ class APIRouter(DefaultRouter):
 
     def register(self, prefix: str, view: ViewType, basename: str = None, **kwargs: Any):  # pylint: disable=W0237
         if basename is None:
-            basename = self.get_default_basename(view)
+            basename = self.get_default_basename(view)  # pragma: no cover
 
+        # Construct default values for regex parts
         params = {key: "..." for key in re.compile(prefix).groupindex}
         params.update(kwargs)
         self.registry.append((prefix, view, basename, params))
 
-        if hasattr(self, "_urls"):
+        # Invalidate the urls cache
+        if hasattr(self, "_urls"):  # pragma: no cover
             del self._urls
 
     @property
@@ -65,13 +67,13 @@ class APIRouter(DefaultRouter):
     def navigation_routes(self, value: Dict[str, "APIRouter"]):
         self._navigation_routes = value
 
-    def get_routes(self, viewset: type[Union[ViewSetMixin, APIView]]):
+    def get_routes(self, viewset: Type[Union[ViewSetMixin, APIView]]):
         if issubclass(viewset, ViewSetMixin):
             return super().get_routes(viewset)
-        return []
+        return []  # pragma: no cover
 
     def get_api_root_view(self, api_urls: UrlsType = None) -> Callable[..., Any]:
-        api_root_dict: Dict[str, Tuple[str, dict[str, Any]]] = {}
+        api_root_dict: Dict[str, Tuple[str, Dict[str, Any]]] = {}
         list_name = self.routes[0].name
 
         for prefix, viewset, basename, kwargs in self.registry:
@@ -87,7 +89,7 @@ class APIRouter(DefaultRouter):
 
     def format_regex(self, url: str, prefix: str, lookup: str = "") -> str:
         regex = url.format(prefix=prefix, lookup=lookup, trailing_slash=self.trailing_slash)
-        if not prefix and regex[:2] == "^/":
+        if not prefix and regex[:2] == "^/":  # pragma: no cover
             regex = "^" + regex[2:]
         return regex
 

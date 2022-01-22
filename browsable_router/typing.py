@@ -1,4 +1,9 @@
-from typing import Any, Callable, Dict, List, Optional, Protocol, Set, Tuple, Type, Union
+try:
+    from typing import Any, Callable, Dict, List, Optional, Protocol, Set, Tuple, Type, Union
+except ImportError:
+    from typing_extensions import Protocol
+    from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type, Union
+
 
 from django.urls import URLPattern, URLResolver
 from rest_framework.serializers import Serializer

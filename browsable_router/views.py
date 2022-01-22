@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class APIRootView(APIView):
     """Welcome! This is the API root."""
 
-    api_root_dict: Dict[str, Tuple[str, dict[str, Any]]] = {}
+    api_root_dict: Dict[str, Tuple[str, Dict[str, Any]]] = {}
 
     authentication_classes = []
     permission_classes = []

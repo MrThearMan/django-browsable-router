@@ -129,6 +129,7 @@ omit = [
 exclude_lines = [
     "if TYPE_CHECKING:",
     "except ImportError:",
+    "pragma: no cover"
 ]
 
 [tool.tox]
