@@ -12,6 +12,7 @@ from rest_framework.viewsets import ViewSetMixin
 
 
 __all__ = [
+    "ViewProtocol",
     "DictOrListOfDicts",
     "Any",
     "Dict",
@@ -24,6 +25,7 @@ __all__ = [
     "Tuple",
     "UrlsType",
     "ViewType",
+    "List",
 ]
 
 

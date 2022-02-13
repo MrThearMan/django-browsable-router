@@ -1,8 +1,6 @@
 import pytest
 from django.http import HttpResponse
 
-from browsable_router import APIMetadata, SerializerAsOutputMetadata
-
 
 @pytest.mark.django_db
 def test_test1_view_metadata(client):

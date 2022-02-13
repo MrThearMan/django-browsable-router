@@ -1,7 +1,7 @@
 import logging
 import re
 
-from django.urls import include, path, re_path
+from django.urls import include, re_path
 from django.urls.resolvers import URLPattern, URLResolver
 from rest_framework.routers import DefaultRouter
 from rest_framework.schemas import DefaultSchema
@@ -9,7 +9,7 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSetMixin
 
-from .typing import Any, Callable, Dict, List, Tuple, Type, Union, UrlsType, ViewType
+from .typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, UrlsType, ViewType
 from .views import APIRootView as RootView
 
 
@@ -27,13 +27,15 @@ class APIRouter(DefaultRouter):
 
     def __init__(
         self,
-        name: str = None,
-        docstring: str = None,
+        *,
+        name: Optional[str] = None,
+        docstring: Optional[str] = None,
         show_in_shema: bool = False,
         ignore_model_permissions: bool = False,
-        **kwargs,
+        navigation_routes: Optional[Dict[str, "APIRouter"]] = None,
+        **kwargs: Any,
     ):
-        self._navigation_routes: Dict[str, "APIRouter"] = {}
+        self._navigation_routes: Dict[str, "APIRouter"] = navigation_routes or {}
 
         name = name if name is not None else self.APIRootView.__name__
         self._root_view: Type[self.APIRootView] = type(name, (self.APIRootView,), {})  # noqa
@@ -83,7 +85,7 @@ class APIRouter(DefaultRouter):
                 api_root_dict[prefix] = basename, kwargs
 
         for basename in self.navigation_routes:
-            api_root_dict[fr"{basename}"] = basename, {}
+            api_root_dict[rf"{basename}"] = basename, {}
 
         return self._root_view.as_view(api_root_dict=api_root_dict)
 
@@ -128,6 +130,6 @@ class APIRouter(DefaultRouter):
 
         for basename, router in self.navigation_routes.items():
             router.root_view_name = basename
-            urls.append(path(f"{basename}/", include(router.urls)))
+            urls.append(re_path(rf"^{basename}/$", include(router.urls)))
 
         return urls
