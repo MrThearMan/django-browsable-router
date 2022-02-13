@@ -130,6 +130,6 @@ class APIRouter(DefaultRouter):
 
         for basename, router in self.navigation_routes.items():
             router.root_view_name = basename
-            urls.append(re_path(rf"^{basename}/$", include(router.urls)))
+            urls.append(re_path(rf"^{basename}/", include(router.urls)))
 
         return urls
