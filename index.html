@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="None">
+  
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Django REST framework Browsable Router</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/python.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> Django REST framework Browsable Router</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">Django REST framework Browsable Router</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="django-browsable-router">Django Browsable Router</h1>
+<p><a href="https://coveralls.io/github/MrThearMan/django-browsable-router?branch=main"><img alt="Coverage Status" src="https://coveralls.io/repos/github/MrThearMan/django-browsable-router/badge.svg?branch=main" /></a>
+<a href="https://github.com/MrThearMan/django-browsable-router/actions/workflows/main.yml"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/MrThearMan/django-browsable-router/Tests" /></a>
+<a href="https://pypi.org/project/django-browsable-router"><img alt="PyPI" src="https://img.shields.io/pypi/v/django-browsable-router" /></a>
+<a href="https://github.com/MrThearMan/django-browsable-router/blob/main/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/MrThearMan/django-browsable-router" /></a>
+<a href="https://github.com/MrThearMan/django-browsable-router/commits/main"><img alt="GitHub Last Commit" src="https://img.shields.io/github/last-commit/MrThearMan/django-browsable-router" /></a>
+<a href="https://github.com/MrThearMan/django-browsable-router/issues"><img alt="GitHub Issues" src="https://img.shields.io/github/issues-raw/MrThearMan/django-browsable-router" /></a>
+<a href="https://pypi.org/project/django-browsable-router"><img alt="Python Version" src="https://img.shields.io/pypi/pyversions/django-browsable-router" /></a></p>
+<pre><code class="language-shell">pip install django-browsable-router
+</code></pre>
+<hr />
+<p><strong>Documentation</strong>: <a href="https://mrthearman.github.io/django-browsable-router/">https://mrthearman.github.io/django-browsable-router/</a></p>
+<p><strong>Source Code</strong>: <a href="https://github.com/MrThearMan/django-browsable-router/">https://github.com/MrThearMan/django-browsable-router/</a></p>
+<hr />
+<p>A Django Restframework router that can show APIViews and include other routers as navigable urls in the root view.</p>
+<pre><code class="language-python">from browsable_router import APIRouter
+from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
+
+class TestView(APIView):
+  ...
+
+class TestViewSet(ViewSet):
+  ...
+
+router_1 = APIRouter(name=&quot;other_routes&quot;, docstring=&quot;These are under a different route.&quot;)
+router_1.register(r&quot;view-1&quot;, TestView.as_view(), &quot;view_1&quot;)
+router_1.register(r&quot;view-2&quot;, TestViewSet.as_view(), &quot;view_2&quot;)
+
+router_2 = APIRouter()
+router_2.register(r&quot;view-3&quot;, TestView.as_view(), &quot;view_3&quot;)
+router_2.navigation_routes = {
+    &quot;route&quot;: router_1,
+}
+
+urlpatterns = [
+    path(&quot;api/&quot;, include(router_2.urls))
+]
+</code></pre>
+<p>Resulting browsable API:</p>
+<pre><code class="language-python">#   API Root:
+#   &quot;&quot;&quot;API root.&quot;&quot;&quot;
+#
+#   &quot;route&quot;:    &quot;/api/route/&quot;
+#   &quot;view-3&quot;:   &quot;/api/view-3/&quot;
+#
+#   Other Routes:
+#   &quot;&quot;&quot;These are under a different route.&quot;&quot;&quot;
+#
+#   &quot;view-1&quot;:    &quot;/api/route/view-1/&quot;
+#   &quot;view-2&quot;:    &quot;/api/route/view-2/&quot;
+</code></pre>
+<hr />
+<h1 id="additional-stuff">Additional stuff:</h1>
+<h3 id="apimetadata">ApiMetadata</h3>
+<p>This metadata class is enabled by default on BaseAPIView, and it will allow you to document your views automatically.
+Basically, it reads the InputSerializers fields as input, and the OutputSerializer fields as the output for each HTTP method for that view.
+You can then make a OPTIONS request to the view endpoint and get a JSON Schema-ish representation of the input and output for that endpoint.</p>
+<h3 id="serializerasoutputmetadata">SerializerAsOutputMetadata</h3>
+<p>This metadata class works like APIMetadata class, but is intended for the generic views that come with django rest framework.
+It assumes that the endpoint takes no arguments and returns the method serializers fields as output.</p>
+<h3 id="blockschemaaccess">BlockSchemaAccess</h3>
+<p>This is a permission class that can be used to block access to OPTIONS schema in production (DEBUG=False).</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.2.3
+Build Date UTC : 2022-02-13 20:01:14.069761+00:00
+-->
