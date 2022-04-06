@@ -1,3 +1,8 @@
+> Project has changed name, and is now developed here:
+>
+> https://github.com/MrThearMan/drf-tree-router
+
+
 # Django Browsable Router
 
 [![Coverage Status][coverage-badge]][coverage]
